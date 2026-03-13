@@ -1,5 +1,7 @@
 # @repo/env
 
+> 🇹🇷 [Türkçe](./README.tr.md)
+
 Centralized environment variable validation for the monorepo. Re-exports `createEnv` from `@t3-oss/env-core` and `z` from Zod so that apps have a single import for env validation.
 
 ## Exports

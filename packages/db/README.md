@@ -1,5 +1,7 @@
 # @repo/db
 
+> 🇹🇷 [Türkçe](./README.tr.md)
+
 Database package using [Drizzle ORM](https://orm.drizzle.team/) with SQLite (via `better-sqlite3`).
 
 ## Exports

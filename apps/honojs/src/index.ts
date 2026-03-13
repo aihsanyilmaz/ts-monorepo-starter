@@ -1,4 +1,6 @@
 import { serve } from '@hono/node-server';
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
@@ -8,6 +10,9 @@ import { createDb } from '@repo/db';
 import health from './routes/health.js';
 import usersRoute from './routes/users.js';
 import postsRoute from './routes/posts.js';
+
+// Ensure data directory exists for SQLite
+mkdirSync(dirname(env.DATABASE_URL), { recursive: true });
 
 const db = createDb(env.DATABASE_URL);
 

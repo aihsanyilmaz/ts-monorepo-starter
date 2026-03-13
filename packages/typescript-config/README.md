@@ -1,5 +1,7 @@
 # @repo/typescript-config
 
+> 🇹🇷 [Türkçe](./README.tr.md)
+
 Shared [TypeScript](https://www.typescriptlang.org/) configurations for the monorepo.
 
 ## Available Configs

@@ -1,5 +1,7 @@
 # @repo/api-client
 
+> 🇹🇷 [Türkçe](./README.tr.md)
+
 Type-safe HTTP client for the Hono API, powered by [Hono RPC](https://hono.dev/docs/guides/rpc).
 
 ## Exports
