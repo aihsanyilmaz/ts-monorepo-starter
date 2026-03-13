@@ -24,3 +24,7 @@
 | D016 | S02 | arch | packages/shared independent of packages/db | No shared→db or db→shared imports | Prevents circular dependencies; types flow one-way: shared→apps, db→apps | No |
 | D017 | S02 | arch | better-sqlite3 external in tsup | Mark native module as external, not bundled | Native modules cannot be bundled by esbuild; must remain as require() at runtime | No |
 | D018 | S02 | tooling | pnpm.onlyBuiltDependencies for native addons | Whitelist better-sqlite3 in root package.json | pnpm v10 blocks postinstall scripts by default; explicit allowlist needed for native compilation | No |
+| D019 | S03 | arch | api-client depends on honojs app for AppType | packages/api-client → apps/honojs workspace dependency (type-only import) | Standard Hono RPC monorepo pattern; turbo ^build handles ordering; enables end-to-end type safety without codegen | No |
+| D020 | S03 | convention | Hono API default port 3001 | PORT defaults to 3001, not 3000 | Avoids collision with Next.js default port (3000); each app gets a distinct default port | No |
+| D021 | S03 | tooling | skipNodeModulesBundle for app tsup configs | Use tsup `skipNodeModulesBundle: true` for apps | Apps are not libraries — no need to bundle deps; avoids maintaining external lists as deps grow | No |
+| D022 | S03 | arch | Idempotent table bootstrap at app startup | CREATE TABLE IF NOT EXISTS in index.ts | No migration system exists yet; app must self-bootstrap DB tables for dev experience | Yes — when migration system added |

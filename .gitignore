@@ -32,3 +32,9 @@ vendor/
 coverage/
 .cache/
 tmp/
+
+# SQLite
+*.db
+*.db-shm
+*.db-wal
+*.db-journal

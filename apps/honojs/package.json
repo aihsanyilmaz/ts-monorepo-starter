@@ -1,0 +1,35 @@
+{
+  "name": "@repo/honojs",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsup",
+    "lint": "eslint .",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "hono": "catalog:",
+    "@hono/node-server": "catalog:",
+    "@hono/zod-validator": "catalog:",
+    "drizzle-orm": "catalog:",
+    "@repo/env": "workspace:*",
+    "@repo/db": "workspace:*",
+    "@repo/shared": "workspace:*"
+  },
+  "devDependencies": {
+    "tsx": "catalog:",
+    "tsup": "catalog:",
+    "typescript": "catalog:",
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "eslint": "catalog:"
+  }
+}

@@ -1,0 +1,124 @@
+import { Hono } from 'hono';
+import { zValidator } from '@hono/zod-validator';
+import { z } from '@repo/env';
+import { eq } from 'drizzle-orm';
+import type { ApiResponse } from '@repo/shared';
+import type { createDb } from '@repo/db';
+import { posts } from '@repo/db';
+
+type Env = { Variables: { db: ReturnType<typeof createDb> } };
+
+type Post = {
+  id: string;
+  title: string;
+  content: string;
+  authorId: string;
+  createdAt: string;
+};
+
+const CreatePostSchema = z.object({
+  title: z.string().min(1),
+  content: z.string().min(1),
+  authorId: z.coerce.number().int().positive(),
+});
+
+function toPost(row: typeof posts.$inferSelect): Post {
+  return {
+    id: String(row.id),
+    title: row.title,
+    content: row.content,
+    authorId: String(row.authorId),
+    createdAt: row.createdAt,
+  };
+}
+
+const postsRoute = new Hono<Env>()
+  .get('/', (c) => {
+    const db = c.get('db');
+    const rows = db.select().from(posts).all();
+    const response: ApiResponse<Post[]> = {
+      success: true,
+      data: rows.map(toPost),
+    };
+    return c.json(response);
+  })
+  .get('/:id', (c) => {
+    const db = c.get('db');
+    const id = Number(c.req.param('id'));
+    if (Number.isNaN(id)) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: { code: 'BAD_REQUEST', message: 'Invalid post ID' },
+      };
+      return c.json(response, 400);
+    }
+    const row = db.select().from(posts).where(eq(posts.id, id)).get();
+    if (!row) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: { code: 'NOT_FOUND', message: `Post ${id} not found` },
+      };
+      return c.json(response, 404);
+    }
+    const response: ApiResponse<Post> = {
+      success: true,
+      data: toPost(row),
+    };
+    return c.json(response);
+  })
+  .post(
+    '/',
+    zValidator('json', CreatePostSchema, (result, c) => {
+      if (!result.success) {
+        const response: ApiResponse<never> = {
+          success: false,
+          error: { code: 'VALIDATION_ERROR', message: result.error.message },
+        };
+        return c.json(response, 400);
+      }
+    }),
+    (c) => {
+      const db = c.get('db');
+      const body = c.req.valid('json');
+      const row = db
+        .insert(posts)
+        .values({
+          title: body.title,
+          content: body.content,
+          authorId: body.authorId,
+        })
+        .returning()
+        .get();
+      const response: ApiResponse<Post> = {
+        success: true,
+        data: toPost(row),
+      };
+      return c.json(response, 201);
+    },
+  )
+  .delete('/:id', (c) => {
+    const db = c.get('db');
+    const id = Number(c.req.param('id'));
+    if (Number.isNaN(id)) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: { code: 'BAD_REQUEST', message: 'Invalid post ID' },
+      };
+      return c.json(response, 400);
+    }
+    const row = db.delete(posts).where(eq(posts.id, id)).returning().get();
+    if (!row) {
+      const response: ApiResponse<never> = {
+        success: false,
+        error: { code: 'NOT_FOUND', message: `Post ${id} not found` },
+      };
+      return c.json(response, 404);
+    }
+    const response: ApiResponse<Post> = {
+      success: true,
+      data: toPost(row),
+    };
+    return c.json(response);
+  });
+
+export default postsRoute;

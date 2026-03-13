@@ -60,7 +60,7 @@ This milestone is complete only when all are true:
 - [x] **S02: Paylaşımlı Paketler (env, db, shared)** `risk:medium` `depends:[S01]`
   > After this: `packages/env` exports Zod env validation factory, `packages/db` has Drizzle schema with SQLite, `packages/shared` has common types and Zod schemas. Verified by `pnpm build` on all packages.
 
-- [ ] **S03: HonoJS API App + API Client** `risk:medium` `depends:[S02]`
+- [x] **S03: HonoJS API App + API Client** `risk:medium` `depends:[S02]`
   > After this: `pnpm dev --filter honojs` starts API on localhost, dummy endpoints respond, `packages/api-client` exports typed Hono RPC client. Verified by HTTP request to dummy endpoint.
 
 - [ ] **S04: NestJS API App** `risk:low` `depends:[S02]`
