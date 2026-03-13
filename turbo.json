@@ -13,6 +13,10 @@
     "lint": {
       "dependsOn": ["^build"]
     },
+    "apps/nextjs#build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
     "check-types": {
       "dependsOn": ["^build"]
     },

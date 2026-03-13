@@ -72,7 +72,7 @@ This milestone is complete only when all are true:
 - [x] **S06: Expo React Native App** `risk:high` `depends:[S02, S03]`
   > After this: `pnpm dev --filter react-native` starts Expo, dummy screen renders on web, uses shared packages and TanStack Query. Verified by Expo web output in browser.
 
-- [ ] **S07: Dokümantasyon & Final Polish** `risk:low` `depends:[S01, S02, S03, S04, S05, S06]`
+- [x] **S07: Dokümantasyon & Final Polish** `risk:low` `depends:[S01, S02, S03, S04, S05, S06]`
   > After this: Root README + all app/package READMEs complete, `.env.example` files in place, fresh `pnpm dev` starts everything. Verified by reading README and following setup steps.
 
 ## Boundary Map
