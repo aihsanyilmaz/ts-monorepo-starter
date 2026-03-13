@@ -1,5 +1,7 @@
 # @repo/shared
 
+> 🇹🇷 [Türkçe](./README.tr.md)
+
 Shared Zod schemas and TypeScript types used across apps. This package is intentionally independent of `@repo/db` to prevent circular dependencies.
 
 ## Exports

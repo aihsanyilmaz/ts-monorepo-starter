@@ -1,5 +1,7 @@
 # @repo/react-native
 
+> 🇹🇷 [Türkçe](./README.tr.md)
+
 Cross-platform mobile and web app built with [Expo](https://expo.dev/) (React Native) and [Expo Router](https://docs.expo.dev/router/introduction/).
 
 ## Tech Stack

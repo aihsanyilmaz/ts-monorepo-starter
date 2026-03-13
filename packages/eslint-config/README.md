@@ -1,5 +1,7 @@
 # @repo/eslint-config
 
+> 🇹🇷 [Türkçe](./README.tr.md)
+
 Shared [ESLint](https://eslint.org/) flat config for the monorepo.
 
 ## What's Included

@@ -1,0 +1,60 @@
+services:
+  honojs:
+    build:
+      context: .
+      dockerfile: apps/honojs/Dockerfile
+      target: deps
+    command: pnpm --filter @repo/honojs dev
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./apps/honojs/src:/app/apps/honojs/src
+      - ./packages/shared/src:/app/packages/shared/src
+      - ./packages/db/src:/app/packages/db/src
+      - ./packages/env/src:/app/packages/env/src
+      - honojs-data:/app/apps/honojs/data
+    environment:
+      - PORT=3001
+      - NODE_ENV=development
+      - DATABASE_URL=./data/dev.db
+
+  nestjs:
+    build:
+      context: .
+      dockerfile: apps/nestjs/Dockerfile
+      target: deps
+    command: pnpm --filter @repo/nestjs dev
+    ports:
+      - "3002:3002"
+    volumes:
+      - ./apps/nestjs/src:/app/apps/nestjs/src
+      - ./packages/shared/src:/app/packages/shared/src
+      - ./packages/db/src:/app/packages/db/src
+      - ./packages/env/src:/app/packages/env/src
+      - nestjs-data:/app/apps/nestjs/data
+    environment:
+      - PORT=3002
+      - NODE_ENV=development
+      - DATABASE_URL=./data/dev.db
+
+  nextjs:
+    build:
+      context: .
+      dockerfile: apps/nextjs/Dockerfile
+      target: deps
+    command: pnpm --filter @repo/nextjs dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/nextjs/src:/app/apps/nextjs/src
+      - ./packages/shared/src:/app/packages/shared/src
+      - ./packages/api-client/src:/app/packages/api-client/src
+      - ./packages/env/src:/app/packages/env/src
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - honojs
+
+volumes:
+  honojs-data:
+  nestjs-data:

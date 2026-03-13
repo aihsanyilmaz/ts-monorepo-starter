@@ -1,5 +1,7 @@
 # @repo/honojs
 
+> 🇹🇷 [Türkçe](./README.tr.md)
+
 Lightweight REST API server built with [Hono](https://hono.dev/) and the `@hono/node-server` adapter.
 
 ## Tech Stack
@@ -48,6 +50,30 @@ node dist/index.js
 ```
 
 The API exports its `AppType` for use by `@repo/api-client`, enabling end-to-end type-safe RPC clients in Next.js and Expo apps.
+
+## Docker
+
+The Dockerfile uses a multi-stage build (base → deps → build → production) and must be built from the **monorepo root**:
+
+```bash
+# Build production image
+docker build -f apps/honojs/Dockerfile -t repo-honojs .
+
+# Run
+docker run -p 3001:3001 -e PORT=3001 -e NODE_ENV=production -e DATABASE_URL=./data/prod.db repo-honojs
+```
+
+Or use docker-compose from the repo root:
+
+```bash
+# Development (hot-reload via volume mounts)
+pnpm docker:dev
+
+# Production
+pnpm docker:prod
+```
+
+Production image size: **~101 MB** (node:22-alpine base).
 
 ## Port
 

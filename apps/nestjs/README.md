@@ -1,5 +1,7 @@
 # @repo/nestjs
 
+> 🇹🇷 [Türkçe](./README.tr.md)
+
 Enterprise-grade REST API server built with [NestJS](https://nestjs.com/).
 
 ## Tech Stack
@@ -52,6 +54,30 @@ pnpm start
 
 - Dev mode uses `@swc-node/register/esm-register` because esbuild/tsx cannot emit decorator metadata required by NestJS DI.
 - Production build uses `tsc` (not tsup) for the same reason — tsup's esbuild backend strips decorator metadata.
+
+## Docker
+
+The Dockerfile uses a multi-stage build (base → deps → build → production) and must be built from the **monorepo root**:
+
+```bash
+# Build production image
+docker build -f apps/nestjs/Dockerfile -t repo-nestjs .
+
+# Run
+docker run -p 3002:3002 -e PORT=3002 -e NODE_ENV=production -e DATABASE_URL=./data/prod.db repo-nestjs
+```
+
+Or use docker-compose from the repo root:
+
+```bash
+# Development (hot-reload via volume mounts)
+pnpm docker:dev
+
+# Production
+pnpm docker:prod
+```
+
+Production image size: **~108 MB** (node:22-alpine base).
 
 ## Port
 
