@@ -1,7 +1,7 @@
 # GSD State
 
 **Active Milestone:** M001 — TypeScript Monorepo Starter Template
-**Active Slice:** S05 — Next.js Web App
+**Active Slice:** S06 — Expo React Native App
 **Phase:** planning
 **Requirements Status:** 18 active · 0 validated · 0 deferred · 3 out of scope
 
@@ -15,4 +15,4 @@
 - None
 
 ## Next Action
-Plan slice S05 (Next.js Web App).
+Plan slice S06 (Expo React Native App).

@@ -1,5 +1,6 @@
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import { sql } from 'drizzle-orm';
 import { env } from './env.js';
@@ -36,6 +37,7 @@ app.use('*', async (c, next) => {
 });
 
 app.use('*', logger());
+app.use('*', cors());
 
 const routes = app
   .route('/api/health', health)

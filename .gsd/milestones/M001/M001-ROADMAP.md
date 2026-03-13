@@ -66,7 +66,7 @@ This milestone is complete only when all are true:
 - [x] **S04: NestJS API App** `risk:low` `depends:[S02]`
   > After this: `pnpm dev --filter nestjs` starts API on localhost, dummy endpoints respond, uses shared env/db/shared packages. Verified by HTTP request to dummy endpoint.
 
-- [ ] **S05: Next.js Web App** `risk:medium` `depends:[S02, S03]`
+- [x] **S05: Next.js Web App** `risk:medium` `depends:[S02, S03]`
   > After this: `pnpm dev --filter nextjs` starts Next.js on localhost, shadcn/ui dummy page renders, TanStack Query configured, uses api-client. Verified by loading page in browser.
 
 - [ ] **S06: Expo React Native App** `risk:high` `depends:[S02, S03]`
