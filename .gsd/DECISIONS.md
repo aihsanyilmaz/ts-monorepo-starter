@@ -19,3 +19,8 @@
 | D011 | S01 | convention | Workspace package scope | `@repo/` prefix | Turborepo convention, avoids npm name conflicts, clear internal-only signal | No |
 | D012 | S01 | tooling | pnpm catalog for shared versions | Use `catalog:` protocol in pnpm-workspace.yaml | Single source of truth for TypeScript, ESLint, Prettier versions across all workspace packages | No |
 | D013 | S01 | convention | eslint-config has no check-types | Skip tsc on pure-JS config packages | Package is .mjs only; checkJs flags third-party type mismatches that are not actionable. Lint covers correctness. | No |
+| D014 | S02 | tooling | tsup for shared package builds | tsup with ESM format + DTS generation | Handles ESM output, declaration generation, and tree-shaking cleanly; avoids NodeNext .js extension complexity | No |
+| D015 | S02 | tooling | Zod 4 as validation library | zod ^4.0.0 via pnpm catalog | Latest stable, TypeScript-first, supported by t3-env and drizzle-zod | Yes — if Zod 4 compat issues arise |
+| D016 | S02 | arch | packages/shared independent of packages/db | No shared→db or db→shared imports | Prevents circular dependencies; types flow one-way: shared→apps, db→apps | No |
+| D017 | S02 | arch | better-sqlite3 external in tsup | Mark native module as external, not bundled | Native modules cannot be bundled by esbuild; must remain as require() at runtime | No |
+| D018 | S02 | tooling | pnpm.onlyBuiltDependencies for native addons | Whitelist better-sqlite3 in root package.json | pnpm v10 blocks postinstall scripts by default; explicit allowlist needed for native compilation | No |

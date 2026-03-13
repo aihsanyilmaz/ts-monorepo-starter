@@ -13,6 +13,9 @@
     "format": "turbo run format",
     "format:check": "turbo run format -- --check"
   },
+  "pnpm": {
+    "onlyBuiltDependencies": ["better-sqlite3"]
+  },
   "devDependencies": {
     "prettier": "catalog:",
     "turbo": "catalog:"

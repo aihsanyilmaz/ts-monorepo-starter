@@ -57,7 +57,7 @@ This milestone is complete only when all are true:
 - [x] **S01: Monorepo Altyapısı** `risk:low` `depends:[]`
   > After this: `pnpm install` succeeds, `turbo build/lint/check-types` pipeline works, ESLint + Prettier config shared across workspace. Verified by running `pnpm lint` and `pnpm check-types` on empty packages.
 
-- [ ] **S02: Paylaşımlı Paketler (env, db, shared)** `risk:medium` `depends:[S01]`
+- [x] **S02: Paylaşımlı Paketler (env, db, shared)** `risk:medium` `depends:[S01]`
   > After this: `packages/env` exports Zod env validation factory, `packages/db` has Drizzle schema with SQLite, `packages/shared` has common types and Zod schemas. Verified by `pnpm build` on all packages.
 
 - [ ] **S03: HonoJS API App + API Client** `risk:medium` `depends:[S02]`
