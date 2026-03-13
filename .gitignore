@@ -19,6 +19,7 @@ Thumbs.db
 !.env.example
 node_modules/
 .next/
+.turbo/
 dist/
 build/
 __pycache__/

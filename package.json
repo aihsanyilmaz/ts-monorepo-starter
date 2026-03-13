@@ -1,0 +1,20 @@
+{
+  "name": "@repo/monorepo",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "check-types": "turbo run check-types",
+    "format": "turbo run format",
+    "format:check": "turbo run format -- --check"
+  },
+  "devDependencies": {
+    "prettier": "catalog:",
+    "turbo": "catalog:"
+  }
+}

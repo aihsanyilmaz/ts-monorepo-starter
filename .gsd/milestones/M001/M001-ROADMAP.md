@@ -54,7 +54,7 @@ This milestone is complete only when all are true:
 
 ## Slices
 
-- [ ] **S01: Monorepo Altyapısı** `risk:low` `depends:[]`
+- [x] **S01: Monorepo Altyapısı** `risk:low` `depends:[]`
   > After this: `pnpm install` succeeds, `turbo build/lint/check-types` pipeline works, ESLint + Prettier config shared across workspace. Verified by running `pnpm lint` and `pnpm check-types` on empty packages.
 
 - [ ] **S02: Paylaşımlı Paketler (env, db, shared)** `risk:medium` `depends:[S01]`
