@@ -1,0 +1,15 @@
+{
+  "expo": {
+    "name": "react-native",
+    "slug": "react-native",
+    "scheme": "repo-rn",
+    "version": "1.0.0",
+    "web": {
+      "output": "dist",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-router"
+    ]
+  }
+}

@@ -69,7 +69,7 @@ This milestone is complete only when all are true:
 - [x] **S05: Next.js Web App** `risk:medium` `depends:[S02, S03]`
   > After this: `pnpm dev --filter nextjs` starts Next.js on localhost, shadcn/ui dummy page renders, TanStack Query configured, uses api-client. Verified by loading page in browser.
 
-- [ ] **S06: Expo React Native App** `risk:high` `depends:[S02, S03]`
+- [x] **S06: Expo React Native App** `risk:high` `depends:[S02, S03]`
   > After this: `pnpm dev --filter react-native` starts Expo, dummy screen renders on web, uses shared packages and TanStack Query. Verified by Expo web output in browser.
 
 - [ ] **S07: Dokümantasyon & Final Polish** `risk:low` `depends:[S01, S02, S03, S04, S05, S06]`
