@@ -14,7 +14,7 @@
     "format:check": "turbo run format -- --check"
   },
   "pnpm": {
-    "onlyBuiltDependencies": ["better-sqlite3"]
+    "onlyBuiltDependencies": ["better-sqlite3", "@nestjs/core", "@swc/core"]
   },
   "devDependencies": {
     "prettier": "catalog:",

@@ -1,0 +1,39 @@
+import 'reflect-metadata';
+import { mkdirSync } from 'node:fs';
+import { dirname } from 'node:path';
+import { NestFactory } from '@nestjs/core';
+import { ValidationPipe } from '@nestjs/common';
+import { sql } from 'drizzle-orm';
+import { AppModule } from './app.module.js';
+import { env } from './env.js';
+import { createDb } from '@repo/db';
+
+async function bootstrap() {
+  // Ensure data directory exists for SQLite
+  mkdirSync(dirname(env.DATABASE_URL), { recursive: true });
+
+  // Idempotent table bootstrap (D022 — same as HonoJS app)
+  const db = createDb(env.DATABASE_URL);
+  db.run(sql`CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    created_at TEXT NOT NULL DEFAULT (current_timestamp)
+  )`);
+  db.run(sql`CREATE TABLE IF NOT EXISTS posts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    content TEXT NOT NULL,
+    author_id INTEGER NOT NULL REFERENCES users(id),
+    created_at TEXT NOT NULL DEFAULT (current_timestamp)
+  )`);
+
+  const app = await NestFactory.create(AppModule);
+  app.setGlobalPrefix('api');
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+
+  await app.listen(env.PORT);
+  console.log(`🚀 NestJS server running on http://localhost:${env.PORT}`);
+}
+
+bootstrap();

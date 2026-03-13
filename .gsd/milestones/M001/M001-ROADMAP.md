@@ -63,7 +63,7 @@ This milestone is complete only when all are true:
 - [x] **S03: HonoJS API App + API Client** `risk:medium` `depends:[S02]`
   > After this: `pnpm dev --filter honojs` starts API on localhost, dummy endpoints respond, `packages/api-client` exports typed Hono RPC client. Verified by HTTP request to dummy endpoint.
 
-- [ ] **S04: NestJS API App** `risk:low` `depends:[S02]`
+- [x] **S04: NestJS API App** `risk:low` `depends:[S02]`
   > After this: `pnpm dev --filter nestjs` starts API on localhost, dummy endpoints respond, uses shared env/db/shared packages. Verified by HTTP request to dummy endpoint.
 
 - [ ] **S05: Next.js Web App** `risk:medium` `depends:[S02, S03]`

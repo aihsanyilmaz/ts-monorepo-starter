@@ -28,3 +28,7 @@
 | D020 | S03 | convention | Hono API default port 3001 | PORT defaults to 3001, not 3000 | Avoids collision with Next.js default port (3000); each app gets a distinct default port | No |
 | D021 | S03 | tooling | skipNodeModulesBundle for app tsup configs | Use tsup `skipNodeModulesBundle: true` for apps | Apps are not libraries — no need to bundle deps; avoids maintaining external lists as deps grow | No |
 | D022 | S03 | arch | Idempotent table bootstrap at app startup | CREATE TABLE IF NOT EXISTS in index.ts | No migration system exists yet; app must self-bootstrap DB tables for dev experience | Yes — when migration system added |
+| D023 | S04 | tooling | NestJS dev mode uses @swc-node/register | `node --watch --import @swc-node/register/esm` | esbuild/tsx cannot emit decorator metadata required by NestJS DI; SWC handles it natively | No |
+| D024 | S04 | tooling | NestJS build uses tsc, not tsup | `tsc` for production build | tsup uses esbuild which strips decorator metadata; tsc emits it correctly | No |
+| D025 | S04 | convention | NestJS API default port 3002 | PORT defaults to 3002 | Avoids collision with Next.js (3000) and HonoJS (3001) | No |
+| D026 | S04 | tooling | @swc-node/register/esm-register for Node 24 | Use `esm-register` entry instead of `esm` | The `esm` entry uses deprecated loader hooks that don't intercept ESM resolution on Node 24; `esm-register` uses the current `--import` registration API and correctly maps `.js` → `.ts` | No |
