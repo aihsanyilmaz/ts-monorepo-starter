@@ -10,7 +10,14 @@ A single `git clone` gives you a fully wired, type-safe monorepo with backend + 
 
 ## Current State
 
-Empty repository. No code yet. `.gitignore` and GSD scaffolding only.
+**M001 complete.** The template is fully functional with all four apps and six shared packages built, documented, and verified. All 18 requirements validated.
+
+- `pnpm install` → resolves 11 workspace projects
+- `pnpm dev` → starts HonoJS (:3001), NestJS (:3002), Next.js (:3000), Expo (:8081)
+- `pnpm build` → 8 tasks pass
+- `pnpm lint` → 14 tasks pass
+- `pnpm check-types` → 13 tasks pass
+- Root README + 4 app READMEs + 6 package READMEs in place
 
 ## Architecture / Key Patterns
 
@@ -20,10 +27,12 @@ Empty repository. No code yet. `.gitignore` and GSD scaffolding only.
 - **Pick-your-backend** — HonoJS (lightweight, edge-ready) or NestJS (enterprise, decorator-based)
 - **Env validation** — Zod-based, per-app schemas derived from shared `packages/env` base
 - **DB** — Drizzle ORM, SQLite default, PostgreSQL ready
-- **Web** — Next.js + shadcn/ui (site, blog, dashboard)
+- **Web** — Next.js + shadcn/ui + Tailwind CSS v4 (CSS-first config)
 - **Mobile** — Expo (iOS, Android, Web output)
 - **API client** — Hono RPC type-safe client (shared between frontends when using HonoJS backend)
 - **Business logic sharing** — types, Zod schemas, query hooks shared; UI is platform-specific
+- **pnpm catalog** — shared dependency versions in pnpm-workspace.yaml
+- **ESLint 9.x flat config** — shared across workspace via packages/eslint-config
 
 ## Capability Contract
 
@@ -31,4 +40,4 @@ See `.gsd/REQUIREMENTS.md` for the explicit capability contract, requirement sta
 
 ## Milestone Sequence
 
-- [ ] M001: TypeScript Monorepo Starter Template — Full template with all apps, packages, docs, and working dummy pages
+- [x] M001: TypeScript Monorepo Starter Template — Full template with all apps, packages, docs, and working dummy pages

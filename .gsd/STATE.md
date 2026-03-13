@@ -1,18 +1,18 @@
 # GSD State
 
-**Active Milestone:** M001 — TypeScript Monorepo Starter Template
+**Active Milestone:** None
 **Active Slice:** None
-**Phase:** completing-milestone
-**Requirements Status:** 18 active · 0 validated · 0 deferred · 3 out of scope
+**Phase:** idle
+**Requirements Status:** 0 active · 18 validated · 0 deferred · 3 out of scope
 
 ## Milestone Registry
-- 🔄 **M001:** TypeScript Monorepo Starter Template
+- ✅ **M001:** TypeScript Monorepo Starter Template — completed 2026-03-13
 
 ## Recent Decisions
-- None recorded
+- D001–D034 recorded during M001 (see DECISIONS.md)
 
 ## Blockers
 - None
 
 ## Next Action
-All slices complete in M001. Write milestone summary.
+M001 complete. No queued milestones.
