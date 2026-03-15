@@ -1,5 +1,5 @@
 import { Hono } from 'hono';
-import type { ApiResponse } from '@repo/shared';
+import type { ApiResponse } from '../types.js';
 
 type HealthData = {
   timestamp: string;

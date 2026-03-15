@@ -6,7 +6,12 @@ import {
   View,
 } from 'react-native';
 import { useQuery } from '@tanstack/react-query';
-import type { User } from '@repo/shared';
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+};
 
 import { apiClient } from '@/lib/api';
 

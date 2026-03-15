@@ -1,4 +1,5 @@
-import { createEnv, z } from '@repo/env';
+import { createEnv } from '@t3-oss/env-core';
+import { z } from 'zod';
 
 export const env = createEnv({
   clientPrefix: 'EXPO_PUBLIC_',

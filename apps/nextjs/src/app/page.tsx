@@ -1,7 +1,12 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import type { User } from '@repo/shared';
+type User = {
+  id: string;
+  name: string;
+  email: string;
+  createdAt: string;
+};
 
 import {
   Card,
