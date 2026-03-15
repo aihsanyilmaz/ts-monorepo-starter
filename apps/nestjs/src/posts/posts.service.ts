@@ -1,7 +1,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { posts } from '@repo/db';
-import type { Database } from '@repo/db';
+import type { Db } from '../db/index.js';
+import { posts } from '../db/index.js';
 import { DB_TOKEN } from '../database/database.module.js';
 import type { CreatePostDto } from './posts.dto.js';
 
@@ -19,14 +19,14 @@ function toPost(row: typeof posts.$inferSelect): Post {
     title: row.title,
     content: row.content,
     authorId: String(row.authorId),
-    createdAt: row.createdAt,
+    createdAt: String(row.createdAt),
   };
 }
 
 @Injectable()
 export class PostsService {
   constructor(
-    @Inject(DB_TOKEN) private readonly dbPromise: Promise<Database>,
+    @Inject(DB_TOKEN) private readonly dbPromise: Promise<Db>,
   ) {}
 
   async findAll(): Promise<Post[]> {

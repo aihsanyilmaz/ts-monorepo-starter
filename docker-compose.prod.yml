@@ -22,14 +22,12 @@ services:
       target: production
     ports:
       - "3001:3001"
+    volumes:
+      - honojs-data:/app/apps/honojs/data
     environment:
       - PORT=3001
       - NODE_ENV=production
-      - DB_DRIVER=pg
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-monorepo_prod}
-    depends_on:
-      postgres:
-        condition: service_healthy
+      - DATABASE_URL=./data/prod.db
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
@@ -48,7 +46,6 @@ services:
     environment:
       - PORT=3002
       - NODE_ENV=production
-      - DB_DRIVER=pg
       - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-monorepo_prod}
     depends_on:
       postgres:
@@ -86,3 +83,4 @@ services:
 
 volumes:
   postgres-data:
+  honojs-data:

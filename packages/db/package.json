@@ -21,13 +21,7 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "lint": "eslint .",
-    "check-types": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate --config drizzle.sqlite.config.ts",
-    "db:migrate": "drizzle-kit migrate --config drizzle.sqlite.config.ts",
-    "db:studio": "drizzle-kit studio --config drizzle.sqlite.config.ts",
-    "db:generate:pg": "drizzle-kit generate --config drizzle.pg.config.ts",
-    "db:migrate:pg": "drizzle-kit migrate --config drizzle.pg.config.ts",
-    "db:studio:pg": "drizzle-kit studio --config drizzle.pg.config.ts"
+    "check-types": "tsc --noEmit"
   },
   "dependencies": {
     "better-sqlite3": "catalog:",
@@ -39,7 +33,6 @@
     "@repo/typescript-config": "workspace:*",
     "@types/better-sqlite3": "catalog:",
     "@types/pg": "catalog:",
-    "drizzle-kit": "catalog:",
     "eslint": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:"

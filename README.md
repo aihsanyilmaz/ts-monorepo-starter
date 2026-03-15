@@ -38,7 +38,7 @@ That's it. All four apps start with sensible defaults — no `.env` files requir
 │   └── react-native/     # Mobile + web app (Expo SDK)
 ├── packages/
 │   ├── api-client/       # Type-safe Hono RPC client
-│   ├── db/               # Drizzle ORM — SQLite (default) or PostgreSQL
+│   ├── db/               # Drizzle ORM client factory (driver-only, no schemas)
 │   ├── env/              # Zod-based env validation (createEnv + z re-exports)
 │   ├── eslint-config/    # Shared ESLint flat configs (base, library, react, next)
 │   ├── shared/           # Shared types, schemas, and utilities
@@ -64,7 +64,7 @@ That's it. All four apps start with sensible defaults — no `.env` files requir
 | Package | Purpose |
 |---------|---------|
 | `@repo/api-client` | Type-safe Hono RPC client — imports `AppType` from `apps/honojs` for end-to-end type safety without codegen. |
-| `@repo/db` | Drizzle ORM with dual-driver support — SQLite (default, zero-config) or PostgreSQL. Set `DB_DRIVER=pg` to switch. |
+| `@repo/db` | Drizzle ORM client factory — provides `createSqliteDb()` and `createPgDb()`. Each app owns its own schema and migrations. |
 | `@repo/env` | Re-exports `createEnv` from `@t3-oss/env-core` and `z` from Zod. Each app defines its own env schema using these primitives. |
 | `@repo/shared` | Shared TypeScript types, Zod schemas, constants, and utility functions. |
 | `@repo/eslint-config` | ESLint flat config presets: `base`, `library`, `react`, `next`. |
@@ -82,8 +82,8 @@ Backend apps (Hono, NestJS) have **sensible defaults** for all env vars — they
 
 | App | Env File | Variables |
 |-----|----------|-----------|
-| `apps/honojs` | `.env.example` | `PORT` (3001), `NODE_ENV` (development), `DB_DRIVER` (sqlite), `DATABASE_URL` (./data/dev.db) |
-| `apps/nestjs` | `.env.example` | `PORT` (3002), `NODE_ENV` (development), `DB_DRIVER` (sqlite), `DATABASE_URL` (./data/dev.db) |
+| `apps/honojs` | `.env.example` | `PORT` (3001), `NODE_ENV` (development), `DATABASE_URL` (./data/dev.db) |
+| `apps/nestjs` | `.env.example` | `PORT` (3002), `NODE_ENV` (development), `DATABASE_URL` (postgresql://...) |
 | `apps/nextjs` | `.env.example` | `NEXT_PUBLIC_API_URL` (http://localhost:3001) |
 | `apps/react-native` | `.env.example` | `EXPO_PUBLIC_API_URL` (http://localhost:3001) |
 
@@ -221,32 +221,22 @@ The build context is always the **monorepo root** (`docker build -f apps/xxx/Doc
 
 ### Database
 
-Dual-driver support via Drizzle ORM — **SQLite** (default) or **PostgreSQL**.
+Each app owns its own **schema, migrations, and database driver** — no shared schema coupling.
 
-**SQLite (default, zero-config):**
+| App | Driver | Schema | Config |
+|-----|--------|--------|--------|
+| `apps/honojs` | SQLite (via `@repo/db/sqlite`) | `src/db/schema.ts` | `drizzle.config.ts` |
+| `apps/nestjs` | PostgreSQL (via `@repo/db/pg`) | `src/db/schema.ts` | `drizzle.config.ts` |
+
+`packages/db` is a thin utility layer — client factory and type exports only. No schemas live there.
+
+**Drizzle migrations** are per-app:
 ```bash
-pnpm dev  # Just works — SQLite file created automatically
+cd apps/honojs && pnpm db:generate  # Generate SQLite migration
+cd apps/nestjs && pnpm db:generate  # Generate PG migration
 ```
 
-**PostgreSQL:**
-```bash
-# Option 1: Docker (recommended)
-docker compose up  # Starts PG + all apps automatically
-
-# Option 2: Local PG
-DB_DRIVER=pg DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mydb pnpm dev
-```
-
-Tables are bootstrapped at app startup with `CREATE TABLE IF NOT EXISTS` for both drivers.
-
-**Drizzle migrations** are available for PostgreSQL schema changes:
-```bash
-pnpm db:generate:pg  # Generate migration from schema changes
-pnpm db:migrate:pg   # Apply migrations (needs DATABASE_URL)
-pnpm db:studio:pg    # Open Drizzle Studio for PG
-```
-
-In Docker, PostgreSQL data is persisted via the `postgres-data` named volume.
+Migrations run automatically on app startup. In Docker, PostgreSQL data is persisted via the `postgres-data` named volume.
 
 ## License
 
