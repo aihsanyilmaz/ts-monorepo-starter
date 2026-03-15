@@ -13,7 +13,10 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsup",
     "lint": "eslint .",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "hono": "catalog:",
@@ -25,6 +28,7 @@
     "@repo/shared": "workspace:*"
   },
   "devDependencies": {
+    "drizzle-kit": "catalog:",
     "tsx": "catalog:",
     "tsup": "catalog:",
     "typescript": "catalog:",

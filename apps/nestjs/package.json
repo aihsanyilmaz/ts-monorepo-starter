@@ -14,7 +14,10 @@
     "build": "tsc",
     "start": "node dist/main.js",
     "lint": "eslint .",
-    "check-types": "tsc --noEmit"
+    "check-types": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@nestjs/common": "^11.1.0",
@@ -30,6 +33,7 @@
     "@repo/shared": "workspace:*"
   },
   "devDependencies": {
+    "drizzle-kit": "catalog:",
     "@swc-node/register": "^1.10.0",
     "@swc/core": "^1.12.0",
     "typescript": "catalog:",

@@ -3,10 +3,10 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from '@repo/env';
 import { eq } from 'drizzle-orm';
 import type { ApiResponse, User } from '@repo/shared';
-import type { Database } from '@repo/db';
-import { users } from '@repo/db';
+import type { Db } from '../db/index.js';
+import { users } from '../db/index.js';
 
-type Env = { Variables: { db: Database } };
+type Env = { Variables: { db: Db } };
 
 const CreateUserSchema = z.object({
   name: z.string().min(1),

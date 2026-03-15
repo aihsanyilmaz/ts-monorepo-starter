@@ -1,8 +1,8 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
-import { users } from '@repo/db';
-import type { Database } from '@repo/db';
 import type { User } from '@repo/shared';
+import type { Db } from '../db/index.js';
+import { users } from '../db/index.js';
 import { DB_TOKEN } from '../database/database.module.js';
 import type { CreateUserDto, UpdateUserDto } from './users.dto.js';
 
@@ -11,14 +11,14 @@ function toUser(row: typeof users.$inferSelect): User {
     id: String(row.id),
     name: row.name,
     email: row.email,
-    createdAt: row.createdAt,
+    createdAt: String(row.createdAt),
   };
 }
 
 @Injectable()
 export class UsersService {
   constructor(
-    @Inject(DB_TOKEN) private readonly dbPromise: Promise<Database>,
+    @Inject(DB_TOKEN) private readonly dbPromise: Promise<Db>,
   ) {}
 
   async findAll(): Promise<User[]> {

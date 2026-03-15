@@ -2,63 +2,48 @@
 
 > 🇬🇧 [English](./README.md)
 
-[Drizzle ORM](https://orm.drizzle.team/) kullanan veritabanı paketi — **SQLite** ve **PostgreSQL** desteği, subpath export'lar ile.
+[Drizzle ORM](https://orm.drizzle.team/) kullanan ince veritabanı client factory. Subpath export'lar ile **SQLite** ve **PostgreSQL** client constructor'ları sağlar.
+
+**Bu paket schema veya migration içermez.** Her uygulama kendi schema'sını (`src/db/schema.ts`), Drizzle config'ini ve migration dosyalarını yönetir.
 
 ## Export'lar
 
-### Varsayılan / SQLite (`@repo/db` veya `@repo/db/sqlite`)
+### SQLite (`@repo/db/sqlite`)
 
 ```ts
-import { createDb, schema, users, posts } from '@repo/db';
-// veya açıkça:
-import { createDb, schema, users, posts } from '@repo/db/sqlite';
-```
+import { createSqliteDb } from '@repo/db/sqlite';
+import * as schema from './db/schema.js'; // uygulamanın kendi schema'sı
 
-- **`createDb(url?)`** — Drizzle + better-sqlite3 instance'ı oluşturur. Varsayılan `:memory:`. WAL modu ve foreign key'leri etkinleştirir.
-- **`schema`** — tüm SQLite tablo tanımlarını içeren namespace
-- **`users`** / **`posts`** — tablo şemaları
+const db = createSqliteDb('./data/dev.db', schema);
+const allUsers = await db.select().from(schema.users);
+```
 
 ### PostgreSQL (`@repo/db/pg`)
 
 ```ts
-import { createDb, schema, users, posts } from '@repo/db/pg';
+import { createPgDb } from '@repo/db/pg';
+import * as schema from './db/schema.js'; // uygulamanın kendi schema'sı
+
+const db = createPgDb('postgresql://user:pass@localhost:5432/mydb', schema);
+const allUsers = await db.select().from(schema.users);
 ```
 
-- **`createDb(connectionString)`** — Drizzle + node-postgres instance'ı oluşturur.
-- **`schema`** — tüm PostgreSQL tablo tanımlarını içeren namespace
-- **`users`** / **`posts`** — tablo şemaları
-
-## Kullanım
+### Birleşik (`@repo/db`)
 
 ```ts
-// SQLite
-import { createDb, users } from '@repo/db';
-const db = createDb('./data/dev.db');
-const allUsers = db.select().from(users).all();
-
-// PostgreSQL
-import { createDb, users } from '@repo/db/pg';
-const db = createDb('postgresql://user:pass@localhost:5432/mydb');
-const allUsers = await db.select().from(users);
+import { createSqliteDb, createPgDb } from '@repo/db';
 ```
 
-## Script'ler
+## Scriptler
 
 | Script | Açıklama |
 |--------|----------|
-| `pnpm build` | `tsup` ile build (multi-entry) |
-| `pnpm dev` | Watch modunda build |
+| `pnpm build` | `tsup` ile derle (çoklu giriş noktası) |
+| `pnpm dev` | İzleme modunda derle |
 | `pnpm lint` | ESLint çalıştır |
 | `pnpm check-types` | `tsc --noEmit` ile tip kontrolü |
-| `pnpm db:generate` | SQLite migration'ları oluştur |
-| `pnpm db:migrate` | SQLite migration'ları çalıştır |
-| `pnpm db:studio` | Drizzle Studio aç (SQLite) |
-| `pnpm db:generate:pg` | PostgreSQL migration'ları oluştur |
-| `pnpm db:migrate:pg` | PostgreSQL migration'ları çalıştır |
-| `pnpm db:studio:pg` | Drizzle Studio aç (PostgreSQL) |
 
 ## Notlar
 
-- `better-sqlite3` ve `pg` tsup config'inde external olarak işaretlenmiştir — native modüller esbuild ile bundle'lanamaz.
-- Varsayılan export (`@repo/db`) geriye uyumluluk için SQLite'ı re-export eder.
-- Schema tanımları dialect'e özeldir (`src/sqlite/schema.ts` ve `src/pg/schema.ts`) çünkü Drizzle kolon tipleri dialect'ler arasında farklıdır.
+- `better-sqlite3` ve `pg` tsup config'de external olarak işaretlidir — native modüller esbuild ile bundle edilemez.
+- Uygulamalar schema oluşturma ve migration komutları için kendi devDependencies'lerine `drizzle-kit` eklemelidir.

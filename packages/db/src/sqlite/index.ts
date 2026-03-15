@@ -1,3 +1,2 @@
-export { createDb } from './client.js';
-export * as schema from './schema.js';
-export { users, posts } from './schema.js';
+export { createSqliteDb } from './client.js';
+export type { SqliteDatabase } from './client.js';
