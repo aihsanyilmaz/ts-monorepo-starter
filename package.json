@@ -16,7 +16,13 @@
     "docker:prod": "docker compose -f docker-compose.prod.yml up --build",
     "docker:prod:detach": "docker compose -f docker-compose.prod.yml up --build -d",
     "docker:down": "docker compose down",
-    "docker:prod:down": "docker compose -f docker-compose.prod.yml down"
+    "docker:prod:down": "docker compose -f docker-compose.prod.yml down",
+    "db:generate": "pnpm --filter @repo/db db:generate",
+    "db:migrate": "pnpm --filter @repo/db db:migrate",
+    "db:studio": "pnpm --filter @repo/db db:studio",
+    "db:generate:pg": "pnpm --filter @repo/db db:generate:pg",
+    "db:migrate:pg": "pnpm --filter @repo/db db:migrate:pg",
+    "db:studio:pg": "pnpm --filter @repo/db db:studio:pg"
   },
   "pnpm": {
     "onlyBuiltDependencies": ["better-sqlite3", "@nestjs/core", "@swc/core"]

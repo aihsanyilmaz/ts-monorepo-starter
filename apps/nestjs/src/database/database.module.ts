@@ -1,5 +1,5 @@
 import { Module, Global } from '@nestjs/common';
-import { createDb } from '@repo/db';
+import { createDatabase } from '@repo/db';
 import { env } from '../env.js';
 
 export const DB_TOKEN = Symbol('DB_TOKEN');
@@ -9,7 +9,8 @@ export const DB_TOKEN = Symbol('DB_TOKEN');
   providers: [
     {
       provide: DB_TOKEN,
-      useFactory: () => createDb(env.DATABASE_URL),
+      useFactory: () =>
+        createDatabase({ driver: env.DB_DRIVER, url: env.DATABASE_URL }),
     },
   ],
   exports: [DB_TOKEN],

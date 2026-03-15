@@ -20,17 +20,17 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Get()
-  findAll(): ApiResponse<User[]> {
-    return { success: true, data: this.usersService.findAll() };
+  async findAll(): Promise<ApiResponse<User[]>> {
+    return { success: true, data: await this.usersService.findAll() };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): ApiResponse<User> {
+  async findOne(@Param('id') id: string): Promise<ApiResponse<User>> {
     const numId = Number(id);
     if (Number.isNaN(numId)) {
       throw new BadRequestException('Invalid user ID');
     }
-    const user = this.usersService.findOne(numId);
+    const user = await this.usersService.findOne(numId);
     if (!user) {
       throw new NotFoundException(`User ${id} not found`);
     }
@@ -39,20 +39,20 @@ export class UsersController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() dto: CreateUserDto): ApiResponse<User> {
-    return { success: true, data: this.usersService.create(dto) };
+  async create(@Body() dto: CreateUserDto): Promise<ApiResponse<User>> {
+    return { success: true, data: await this.usersService.create(dto) };
   }
 
   @Put(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @Body() dto: UpdateUserDto,
-  ): ApiResponse<User> {
+  ): Promise<ApiResponse<User>> {
     const numId = Number(id);
     if (Number.isNaN(numId)) {
       throw new BadRequestException('Invalid user ID');
     }
-    const user = this.usersService.update(numId, dto);
+    const user = await this.usersService.update(numId, dto);
     if (!user) {
       throw new NotFoundException(`User ${id} not found`);
     }
@@ -60,12 +60,12 @@ export class UsersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): ApiResponse<User> {
+  async remove(@Param('id') id: string): Promise<ApiResponse<User>> {
     const numId = Number(id);
     if (Number.isNaN(numId)) {
       throw new BadRequestException('Invalid user ID');
     }
-    const user = this.usersService.remove(numId);
+    const user = await this.usersService.remove(numId);
     if (!user) {
       throw new NotFoundException(`User ${id} not found`);
     }

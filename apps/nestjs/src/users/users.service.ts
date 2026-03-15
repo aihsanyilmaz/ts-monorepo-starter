@@ -1,12 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { users } from '@repo/db';
-import type { createDb } from '@repo/db';
+import type { Database } from '@repo/db';
 import type { User } from '@repo/shared';
 import { DB_TOKEN } from '../database/database.module.js';
 import type { CreateUserDto, UpdateUserDto } from './users.dto.js';
-
-type DbInstance = ReturnType<typeof createDb>;
 
 function toUser(row: typeof users.$inferSelect): User {
   return {
@@ -19,43 +17,47 @@ function toUser(row: typeof users.$inferSelect): User {
 
 @Injectable()
 export class UsersService {
-  constructor(@Inject(DB_TOKEN) private readonly db: DbInstance) {}
+  constructor(
+    @Inject(DB_TOKEN) private readonly dbPromise: Promise<Database>,
+  ) {}
 
-  findAll(): User[] {
-    const rows = this.db.select().from(users).all();
+  async findAll(): Promise<User[]> {
+    const db = await this.dbPromise;
+    const rows = await db.select().from(users);
     return rows.map(toUser);
   }
 
-  findOne(id: number): User | undefined {
-    const row = this.db.select().from(users).where(eq(users.id, id)).get();
-    return row ? toUser(row) : undefined;
+  async findOne(id: number): Promise<User | undefined> {
+    const db = await this.dbPromise;
+    const rows = await db.select().from(users).where(eq(users.id, id));
+    return rows[0] ? toUser(rows[0]) : undefined;
   }
 
-  create(dto: CreateUserDto): User {
-    const row = this.db
+  async create(dto: CreateUserDto): Promise<User> {
+    const db = await this.dbPromise;
+    const rows = await db
       .insert(users)
       .values({ name: dto.name, email: dto.email })
-      .returning()
-      .get();
-    return toUser(row);
+      .returning();
+    return toUser(rows[0]!);
   }
 
-  update(id: number, dto: UpdateUserDto): User | undefined {
-    const row = this.db
+  async update(id: number, dto: UpdateUserDto): Promise<User | undefined> {
+    const db = await this.dbPromise;
+    const rows = await db
       .update(users)
       .set(dto)
       .where(eq(users.id, id))
-      .returning()
-      .get();
-    return row ? toUser(row) : undefined;
+      .returning();
+    return rows[0] ? toUser(rows[0]) : undefined;
   }
 
-  remove(id: number): User | undefined {
-    const row = this.db
+  async remove(id: number): Promise<User | undefined> {
+    const db = await this.dbPromise;
+    const rows = await db
       .delete(users)
       .where(eq(users.id, id))
-      .returning()
-      .get();
-    return row ? toUser(row) : undefined;
+      .returning();
+    return rows[0] ? toUser(rows[0]) : undefined;
   }
 }

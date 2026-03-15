@@ -27,17 +27,17 @@ export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Get()
-  findAll(): ApiResponse<PostData[]> {
-    return { success: true, data: this.postsService.findAll() };
+  async findAll(): Promise<ApiResponse<PostData[]>> {
+    return { success: true, data: await this.postsService.findAll() };
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): ApiResponse<PostData> {
+  async findOne(@Param('id') id: string): Promise<ApiResponse<PostData>> {
     const numId = Number(id);
     if (Number.isNaN(numId)) {
       throw new BadRequestException('Invalid post ID');
     }
-    const post = this.postsService.findOne(numId);
+    const post = await this.postsService.findOne(numId);
     if (!post) {
       throw new NotFoundException(`Post ${id} not found`);
     }
@@ -46,17 +46,17 @@ export class PostsController {
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
-  create(@Body() dto: CreatePostDto): ApiResponse<PostData> {
-    return { success: true, data: this.postsService.create(dto) };
+  async create(@Body() dto: CreatePostDto): Promise<ApiResponse<PostData>> {
+    return { success: true, data: await this.postsService.create(dto) };
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): ApiResponse<PostData> {
+  async remove(@Param('id') id: string): Promise<ApiResponse<PostData>> {
     const numId = Number(id);
     if (Number.isNaN(numId)) {
       throw new BadRequestException('Invalid post ID');
     }
-    const post = this.postsService.remove(numId);
+    const post = await this.postsService.remove(numId);
     if (!post) {
       throw new NotFoundException(`Post ${id} not found`);
     }

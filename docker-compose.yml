@@ -1,4 +1,21 @@
 services:
+  postgres:
+    image: postgres:17-alpine
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: monorepo_dev
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+
   honojs:
     build:
       context: .
@@ -12,11 +29,14 @@ services:
       - ./packages/shared/src:/app/packages/shared/src
       - ./packages/db/src:/app/packages/db/src
       - ./packages/env/src:/app/packages/env/src
-      - honojs-data:/app/apps/honojs/data
     environment:
       - PORT=3001
       - NODE_ENV=development
-      - DATABASE_URL=./data/dev.db
+      - DB_DRIVER=pg
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/monorepo_dev
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   nestjs:
     build:
@@ -31,11 +51,14 @@ services:
       - ./packages/shared/src:/app/packages/shared/src
       - ./packages/db/src:/app/packages/db/src
       - ./packages/env/src:/app/packages/env/src
-      - nestjs-data:/app/apps/nestjs/data
     environment:
       - PORT=3002
       - NODE_ENV=development
-      - DATABASE_URL=./data/dev.db
+      - DB_DRIVER=pg
+      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/monorepo_dev
+    depends_on:
+      postgres:
+        condition: service_healthy
 
   nextjs:
     build:
@@ -56,5 +79,4 @@ services:
       - honojs
 
 volumes:
-  honojs-data:
-  nestjs-data:
+  postgres-data:
