@@ -11,9 +11,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~55.0.0",
-    "@repo/api-client": "workspace:*",
-    "@repo/env": "workspace:*",
-    "@repo/shared": "workspace:*",
+    "@repo/honojs": "workspace:*",
     "@t3-oss/env-core": "catalog:",
     "@tanstack/react-query": "^5.76.2",
     "expo": "~55.0.0",
@@ -21,12 +19,14 @@
     "expo-linking": "~55.0.0",
     "expo-router": "~55.0.5",
     "expo-status-bar": "~55.0.0",
+    "hono": "catalog:",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-native": "~0.83.2",
     "react-native-safe-area-context": "~5.6.2",
     "react-native-screens": "~4.23.0",
-    "react-native-web": "~0.21.2"
+    "react-native-web": "~0.21.2",
+    "zod": "catalog:"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

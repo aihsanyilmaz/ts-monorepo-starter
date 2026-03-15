@@ -11,14 +11,13 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
-    "@repo/api-client": "workspace:*",
-    "@repo/env": "workspace:*",
-    "@repo/shared": "workspace:*",
+    "@repo/honojs": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.10",
     "@tailwindcss/postcss": "^4.2.1",
     "@tanstack/react-query": "^5.90.21",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "hono": "catalog:",
     "lucide-react": "^0.577.0",
     "next": "^16.0.0",
     "radix-ui": "^1.4.3",

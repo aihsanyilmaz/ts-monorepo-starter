@@ -22,12 +22,13 @@
     "hono": "catalog:",
     "@hono/node-server": "catalog:",
     "@hono/zod-validator": "catalog:",
+    "@t3-oss/env-core": "catalog:",
+    "better-sqlite3": "catalog:",
     "drizzle-orm": "catalog:",
-    "@repo/env": "workspace:*",
-    "@repo/db": "workspace:*",
-    "@repo/shared": "workspace:*"
+    "zod": "catalog:"
   },
   "devDependencies": {
+    "@types/better-sqlite3": "catalog:",
     "drizzle-kit": "catalog:",
     "tsx": "catalog:",
     "tsup": "catalog:",

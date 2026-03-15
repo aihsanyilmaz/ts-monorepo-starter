@@ -14,7 +14,6 @@ const app = new Hono<Env>();
 
 const db = initDb();
 
-// Inject db into context for all routes
 app.use('*', async (c, next) => {
   c.set('db', db);
   await next();
