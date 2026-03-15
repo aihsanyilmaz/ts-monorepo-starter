@@ -38,7 +38,7 @@ Bu kadar. Dört uygulama da varsayılan ayarlarla başlar — geliştirme için 
 │   └── react-native/     # Mobil + web uygulaması (Expo SDK)
 ├── packages/
 │   ├── api-client/       # Tip güvenli Hono RPC istemcisi
-│   ├── db/               # Drizzle ORM şeması + SQLite bağlantısı
+│   ├── db/               # Drizzle ORM — SQLite (varsayılan) veya PostgreSQL
 │   ├── env/              # Zod tabanlı env doğrulama (createEnv + z)
 │   ├── eslint-config/    # Paylaşılan ESLint flat config'ler
 │   ├── shared/           # Paylaşılan tipler, şemalar ve yardımcılar
@@ -64,7 +64,7 @@ Bu kadar. Dört uygulama da varsayılan ayarlarla başlar — geliştirme için 
 | Paket | Amaç |
 |-------|------|
 | `@repo/api-client` | Tip güvenli Hono RPC istemcisi — codegen olmadan uçtan uca tip güvenliği için `apps/honojs`'den `AppType` import eder. |
-| `@repo/db` | Drizzle ORM şema tanımları ve SQLite veritabanı bağlantısı. Backend uygulamalar arasında paylaşılır. |
+| `@repo/db` | Drizzle ORM ile çift sürücü desteği — SQLite (varsayılan, sıfır yapılandırma) veya PostgreSQL. Geçiş için `DB_DRIVER=pg` ayarlayın. |
 | `@repo/env` | `@t3-oss/env-core`'dan `createEnv` ve Zod'dan `z`'yi yeniden export eder. Her uygulama bu temel öğeleri kullanarak kendi env şemasını tanımlar. |
 | `@repo/shared` | Paylaşılan TypeScript tipleri, Zod şemaları, sabitler ve yardımcı fonksiyonlar. |
 | `@repo/eslint-config` | ESLint flat config ön ayarları: `base`, `library`, `react`, `next`. |
@@ -82,8 +82,8 @@ Backend uygulamalar (Hono, NestJS) tüm env değişkenleri için **varsayılan d
 
 | Uygulama | Env Dosyası | Değişkenler |
 |----------|-------------|-------------|
-| `apps/honojs` | `.env.example` | `PORT` (3001), `NODE_ENV` (development), `DATABASE_URL` (./data/dev.db) |
-| `apps/nestjs` | `.env.example` | `PORT` (3002), `NODE_ENV` (development), `DATABASE_URL` (./data/dev.db) |
+| `apps/honojs` | `.env.example` | `PORT` (3001), `NODE_ENV` (development), `DB_DRIVER` (sqlite), `DATABASE_URL` (./data/dev.db) |
+| `apps/nestjs` | `.env.example` | `PORT` (3002), `NODE_ENV` (development), `DB_DRIVER` (sqlite), `DATABASE_URL` (./data/dev.db) |
 | `apps/nextjs` | `.env.example` | `NEXT_PUBLIC_API_URL` (http://localhost:3001) |
 | `apps/react-native` | `.env.example` | `EXPO_PUBLIC_API_URL` (http://localhost:3001) |
 
@@ -160,7 +160,7 @@ Production özellikleri:
 - **Sağlık kontrolleri** — tüm servislerde Docker `HEALTHCHECK` ile `/api/health` endpoint'leri
 - **Yeniden başlatma politikası** — otomatik kurtarma için `unless-stopped`
 - **Bağımlılık sıralaması** — Next.js, başlamadan önce Hono API'nin sağlıklı olmasını bekler
-- **Kalıcı veri** — SQLite verisi adlandırılmış Docker volume'larında saklanır
+- **Kalıcı veri** — PostgreSQL verisi adlandırılmış Docker volume'larında saklanır
 
 ### Build Argümanları
 
@@ -221,9 +221,32 @@ Build context'i her zaman **monorepo kökü**dür (`docker build -f apps/xxx/Doc
 
 ### Veritabanı
 
-Sıfır yapılandırmalı yerel geliştirme için Drizzle ORM ile SQLite. Tablolar uygulama başlatılırken `CREATE TABLE IF NOT EXISTS` ile oluşturulur. Varsayılan olarak migrasyon sistemi dahil değildir — şemanız stabilize olduğunda ekleyin.
+Drizzle ORM ile çift sürücü desteği — **SQLite** (varsayılan) veya **PostgreSQL**.
 
-Docker'da SQLite verisi adlandırılmış volume'lar (`honojs-data`, `nestjs-data`) ile kalıcı hale getirilir.
+**SQLite (varsayılan, sıfır yapılandırma):**
+```bash
+pnpm dev  # Doğrudan çalışır — SQLite dosyası otomatik oluşturulur
+```
+
+**PostgreSQL:**
+```bash
+# Seçenek 1: Docker (önerilen)
+docker compose up  # PG + tüm uygulamaları otomatik başlatır
+
+# Seçenek 2: Yerel PG
+DB_DRIVER=pg DATABASE_URL=postgresql://postgres:postgres@localhost:5432/mydb pnpm dev
+```
+
+Her iki sürücü için tablolar uygulama başlatılırken `CREATE TABLE IF NOT EXISTS` ile oluşturulur.
+
+**Drizzle migration'ları** PostgreSQL şema değişiklikleri için mevcuttur:
+```bash
+pnpm db:generate:pg  # Şema değişikliklerinden migration oluştur
+pnpm db:migrate:pg   # Migration'ları uygula (DATABASE_URL gerektirir)
+pnpm db:studio:pg    # PG için Drizzle Studio'yu aç
+```
+
+Docker'da PostgreSQL verisi `postgres-data` adlandırılmış volume ile kalıcı hale getirilir.
 
 ## Lisans
 

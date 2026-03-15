@@ -3,10 +3,10 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from '@repo/env';
 import { eq } from 'drizzle-orm';
 import type { ApiResponse } from '@repo/shared';
-import type { createDb } from '@repo/db';
+import type { Database } from '@repo/db';
 import { posts } from '@repo/db';
 
-type Env = { Variables: { db: ReturnType<typeof createDb> } };
+type Env = { Variables: { db: Database } };
 
 type Post = {
   id: string;
@@ -33,16 +33,16 @@ function toPost(row: typeof posts.$inferSelect): Post {
 }
 
 const postsRoute = new Hono<Env>()
-  .get('/', (c) => {
+  .get('/', async (c) => {
     const db = c.get('db');
-    const rows = db.select().from(posts).all();
+    const rows = await db.select().from(posts);
     const response: ApiResponse<Post[]> = {
       success: true,
       data: rows.map(toPost),
     };
     return c.json(response);
   })
-  .get('/:id', (c) => {
+  .get('/:id', async (c) => {
     const db = c.get('db');
     const id = Number(c.req.param('id'));
     if (Number.isNaN(id)) {
@@ -52,7 +52,8 @@ const postsRoute = new Hono<Env>()
       };
       return c.json(response, 400);
     }
-    const row = db.select().from(posts).where(eq(posts.id, id)).get();
+    const rows = await db.select().from(posts).where(eq(posts.id, id));
+    const row = rows[0];
     if (!row) {
       const response: ApiResponse<never> = {
         success: false,
@@ -77,26 +78,25 @@ const postsRoute = new Hono<Env>()
         return c.json(response, 400);
       }
     }),
-    (c) => {
+    async (c) => {
       const db = c.get('db');
       const body = c.req.valid('json');
-      const row = db
+      const rows = await db
         .insert(posts)
         .values({
           title: body.title,
           content: body.content,
           authorId: body.authorId,
         })
-        .returning()
-        .get();
+        .returning();
       const response: ApiResponse<Post> = {
         success: true,
-        data: toPost(row),
+        data: toPost(rows[0]!),
       };
       return c.json(response, 201);
     },
   )
-  .delete('/:id', (c) => {
+  .delete('/:id', async (c) => {
     const db = c.get('db');
     const id = Number(c.req.param('id'));
     if (Number.isNaN(id)) {
@@ -106,7 +106,8 @@ const postsRoute = new Hono<Env>()
       };
       return c.json(response, 400);
     }
-    const row = db.delete(posts).where(eq(posts.id, id)).returning().get();
+    const rows = await db.delete(posts).where(eq(posts.id, id)).returning();
+    const row = rows[0];
     if (!row) {
       const response: ApiResponse<never> = {
         success: false,

@@ -2,41 +2,63 @@
 
 > 🇬🇧 [English](./README.md)
 
-SQLite (`better-sqlite3` aracılığıyla) kullanan [Drizzle ORM](https://orm.drizzle.team/) tabanlı veritabanı paketi.
+[Drizzle ORM](https://orm.drizzle.team/) kullanan veritabanı paketi — **SQLite** ve **PostgreSQL** desteği, subpath export'lar ile.
 
 ## Export'lar
 
+### Varsayılan / SQLite (`@repo/db` veya `@repo/db/sqlite`)
+
 ```ts
 import { createDb, schema, users, posts } from '@repo/db';
+// veya açıkça:
+import { createDb, schema, users, posts } from '@repo/db/sqlite';
 ```
 
-- **`createDb(url?)`** — bir Drizzle veritabanı örneği oluşturur. URL verilmezse varsayılan olarak `:memory:` kullanır. WAL modunu ve yabancı anahtarları etkinleştirir.
-- **`schema`** — tüm tablo tanımlarını içeren ad alanı
-- **`users`** — kullanıcılar tablosu şeması (id, name, email, createdAt)
-- **`posts`** — gönderiler tablosu şeması (id, title, content, authorId, createdAt)
+- **`createDb(url?)`** — Drizzle + better-sqlite3 instance'ı oluşturur. Varsayılan `:memory:`. WAL modu ve foreign key'leri etkinleştirir.
+- **`schema`** — tüm SQLite tablo tanımlarını içeren namespace
+- **`users`** / **`posts`** — tablo şemaları
+
+### PostgreSQL (`@repo/db/pg`)
+
+```ts
+import { createDb, schema, users, posts } from '@repo/db/pg';
+```
+
+- **`createDb(connectionString)`** — Drizzle + node-postgres instance'ı oluşturur.
+- **`schema`** — tüm PostgreSQL tablo tanımlarını içeren namespace
+- **`users`** / **`posts`** — tablo şemaları
 
 ## Kullanım
 
 ```ts
+// SQLite
 import { createDb, users } from '@repo/db';
-
 const db = createDb('./data/dev.db');
 const allUsers = db.select().from(users).all();
+
+// PostgreSQL
+import { createDb, users } from '@repo/db/pg';
+const db = createDb('postgresql://user:pass@localhost:5432/mydb');
+const allUsers = await db.select().from(users);
 ```
 
-## Betikler
+## Script'ler
 
-| Betik | Açıklama |
-|-------|----------|
-| `pnpm build` | `tsup` ile derle |
-| `pnpm dev` | İzleme modunda derle |
+| Script | Açıklama |
+|--------|----------|
+| `pnpm build` | `tsup` ile build (multi-entry) |
+| `pnpm dev` | Watch modunda build |
 | `pnpm lint` | ESLint çalıştır |
-| `pnpm check-types` | `tsc --noEmit` ile tip kontrolü yap |
-| `pnpm db:generate` | Drizzle migration'larını oluştur |
-| `pnpm db:migrate` | Drizzle migration'larını çalıştır |
-| `pnpm db:studio` | Drizzle Studio'yu aç (veritabanı tarayıcısı) |
+| `pnpm check-types` | `tsc --noEmit` ile tip kontrolü |
+| `pnpm db:generate` | SQLite migration'ları oluştur |
+| `pnpm db:migrate` | SQLite migration'ları çalıştır |
+| `pnpm db:studio` | Drizzle Studio aç (SQLite) |
+| `pnpm db:generate:pg` | PostgreSQL migration'ları oluştur |
+| `pnpm db:migrate:pg` | PostgreSQL migration'ları çalıştır |
+| `pnpm db:studio:pg` | Drizzle Studio aç (PostgreSQL) |
 
 ## Notlar
 
-- `better-sqlite3`, tsup yapılandırmasında harici olarak işaretlenmiştir — yerel modüller esbuild tarafından paketlenemez.
-- Kök `package.json` dosyasındaki `pnpm.onlyBuiltDependencies` izin listesi, `better-sqlite3`'ün yerel derlenmesini etkinleştirir.
+- `better-sqlite3` ve `pg` tsup config'inde external olarak işaretlenmiştir — native modüller esbuild ile bundle'lanamaz.
+- Varsayılan export (`@repo/db`) geriye uyumluluk için SQLite'ı re-export eder.
+- Schema tanımları dialect'e özeldir (`src/sqlite/schema.ts` ve `src/pg/schema.ts`) çünkü Drizzle kolon tipleri dialect'ler arasında farklıdır.

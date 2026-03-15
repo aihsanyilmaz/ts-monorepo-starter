@@ -3,10 +3,10 @@ import { zValidator } from '@hono/zod-validator';
 import { z } from '@repo/env';
 import { eq } from 'drizzle-orm';
 import type { ApiResponse, User } from '@repo/shared';
-import type { createDb } from '@repo/db';
+import type { Database } from '@repo/db';
 import { users } from '@repo/db';
 
-type Env = { Variables: { db: ReturnType<typeof createDb> } };
+type Env = { Variables: { db: Database } };
 
 const CreateUserSchema = z.object({
   name: z.string().min(1),
@@ -28,16 +28,16 @@ function toUser(row: typeof users.$inferSelect): User {
 }
 
 const usersRoute = new Hono<Env>()
-  .get('/', (c) => {
+  .get('/', async (c) => {
     const db = c.get('db');
-    const rows = db.select().from(users).all();
+    const rows = await db.select().from(users);
     const response: ApiResponse<User[]> = {
       success: true,
       data: rows.map(toUser),
     };
     return c.json(response);
   })
-  .get('/:id', (c) => {
+  .get('/:id', async (c) => {
     const db = c.get('db');
     const id = Number(c.req.param('id'));
     if (Number.isNaN(id)) {
@@ -47,7 +47,8 @@ const usersRoute = new Hono<Env>()
       };
       return c.json(response, 400);
     }
-    const row = db.select().from(users).where(eq(users.id, id)).get();
+    const rows = await db.select().from(users).where(eq(users.id, id));
+    const row = rows[0];
     if (!row) {
       const response: ApiResponse<never> = {
         success: false,
@@ -72,13 +73,13 @@ const usersRoute = new Hono<Env>()
         return c.json(response, 400);
       }
     }),
-    (c) => {
+    async (c) => {
       const db = c.get('db');
       const body = c.req.valid('json');
-      const row = db.insert(users).values(body).returning().get();
+      const rows = await db.insert(users).values(body).returning();
       const response: ApiResponse<User> = {
         success: true,
-        data: toUser(row),
+        data: toUser(rows[0]!),
       };
       return c.json(response, 201);
     },
@@ -94,7 +95,7 @@ const usersRoute = new Hono<Env>()
         return c.json(response, 400);
       }
     }),
-    (c) => {
+    async (c) => {
       const db = c.get('db');
       const id = Number(c.req.param('id'));
       if (Number.isNaN(id)) {
@@ -105,12 +106,12 @@ const usersRoute = new Hono<Env>()
         return c.json(response, 400);
       }
       const body = c.req.valid('json');
-      const row = db
+      const rows = await db
         .update(users)
         .set(body)
         .where(eq(users.id, id))
-        .returning()
-        .get();
+        .returning();
+      const row = rows[0];
       if (!row) {
         const response: ApiResponse<never> = {
           success: false,
@@ -125,7 +126,7 @@ const usersRoute = new Hono<Env>()
       return c.json(response);
     },
   )
-  .delete('/:id', (c) => {
+  .delete('/:id', async (c) => {
     const db = c.get('db');
     const id = Number(c.req.param('id'));
     if (Number.isNaN(id)) {
@@ -135,7 +136,8 @@ const usersRoute = new Hono<Env>()
       };
       return c.json(response, 400);
     }
-    const row = db.delete(users).where(eq(users.id, id)).returning().get();
+    const rows = await db.delete(users).where(eq(users.id, id)).returning();
+    const row = rows[0];
     if (!row) {
       const response: ApiResponse<never> = {
         success: false,

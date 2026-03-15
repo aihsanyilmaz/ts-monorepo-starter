@@ -7,6 +7,14 @@
     ".": {
       "import": "./dist/index.js",
       "types": "./dist/index.d.ts"
+    },
+    "./sqlite": {
+      "import": "./dist/sqlite.js",
+      "types": "./dist/sqlite.d.ts"
+    },
+    "./pg": {
+      "import": "./dist/pg.js",
+      "types": "./dist/pg.d.ts"
     }
   },
   "scripts": {
@@ -14,18 +22,23 @@
     "dev": "tsup --watch",
     "lint": "eslint .",
     "check-types": "tsc --noEmit",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio"
+    "db:generate": "drizzle-kit generate --config drizzle.sqlite.config.ts",
+    "db:migrate": "drizzle-kit migrate --config drizzle.sqlite.config.ts",
+    "db:studio": "drizzle-kit studio --config drizzle.sqlite.config.ts",
+    "db:generate:pg": "drizzle-kit generate --config drizzle.pg.config.ts",
+    "db:migrate:pg": "drizzle-kit migrate --config drizzle.pg.config.ts",
+    "db:studio:pg": "drizzle-kit studio --config drizzle.pg.config.ts"
   },
   "dependencies": {
     "better-sqlite3": "catalog:",
-    "drizzle-orm": "catalog:"
+    "drizzle-orm": "catalog:",
+    "pg": "catalog:"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/better-sqlite3": "catalog:",
+    "@types/pg": "catalog:",
     "drizzle-kit": "catalog:",
     "eslint": "catalog:",
     "tsup": "catalog:",

@@ -1,4 +1,20 @@
 services:
+  postgres:
+    image: postgres:17-alpine
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-monorepo_prod}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+
   honojs:
     build:
       context: .
@@ -6,12 +22,14 @@ services:
       target: production
     ports:
       - "3001:3001"
-    volumes:
-      - honojs-data:/app/apps/honojs/data
     environment:
       - PORT=3001
       - NODE_ENV=production
-      - DATABASE_URL=./data/prod.db
+      - DB_DRIVER=pg
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-monorepo_prod}
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3001/health"]
@@ -27,12 +45,14 @@ services:
       target: production
     ports:
       - "3002:3002"
-    volumes:
-      - nestjs-data:/app/apps/nestjs/data
     environment:
       - PORT=3002
       - NODE_ENV=production
-      - DATABASE_URL=./data/prod.db
+      - DB_DRIVER=pg
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-monorepo_prod}
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:3002/health"]
@@ -65,5 +85,4 @@ services:
       start_period: 15s
 
 volumes:
-  honojs-data:
-  nestjs-data:
+  postgres-data:

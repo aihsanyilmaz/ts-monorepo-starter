@@ -1,11 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { eq } from 'drizzle-orm';
 import { posts } from '@repo/db';
-import type { createDb } from '@repo/db';
+import type { Database } from '@repo/db';
 import { DB_TOKEN } from '../database/database.module.js';
 import type { CreatePostDto } from './posts.dto.js';
-
-type DbInstance = ReturnType<typeof createDb>;
 
 type Post = {
   id: string;
@@ -27,37 +25,41 @@ function toPost(row: typeof posts.$inferSelect): Post {
 
 @Injectable()
 export class PostsService {
-  constructor(@Inject(DB_TOKEN) private readonly db: DbInstance) {}
+  constructor(
+    @Inject(DB_TOKEN) private readonly dbPromise: Promise<Database>,
+  ) {}
 
-  findAll(): Post[] {
-    const rows = this.db.select().from(posts).all();
+  async findAll(): Promise<Post[]> {
+    const db = await this.dbPromise;
+    const rows = await db.select().from(posts);
     return rows.map(toPost);
   }
 
-  findOne(id: number): Post | undefined {
-    const row = this.db.select().from(posts).where(eq(posts.id, id)).get();
-    return row ? toPost(row) : undefined;
+  async findOne(id: number): Promise<Post | undefined> {
+    const db = await this.dbPromise;
+    const rows = await db.select().from(posts).where(eq(posts.id, id));
+    return rows[0] ? toPost(rows[0]) : undefined;
   }
 
-  create(dto: CreatePostDto): Post {
-    const row = this.db
+  async create(dto: CreatePostDto): Promise<Post> {
+    const db = await this.dbPromise;
+    const rows = await db
       .insert(posts)
       .values({
         title: dto.title,
         content: dto.content,
         authorId: dto.authorId,
       })
-      .returning()
-      .get();
-    return toPost(row);
+      .returning();
+    return toPost(rows[0]!);
   }
 
-  remove(id: number): Post | undefined {
-    const row = this.db
+  async remove(id: number): Promise<Post | undefined> {
+    const db = await this.dbPromise;
+    const rows = await db
       .delete(posts)
       .where(eq(posts.id, id))
-      .returning()
-      .get();
-    return row ? toPost(row) : undefined;
+      .returning();
+    return rows[0] ? toPost(rows[0]) : undefined;
   }
 }
