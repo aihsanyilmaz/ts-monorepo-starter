@@ -1,130 +1,115 @@
 # ts-monorepo-starter
 
-**pnpm workspaces** ve **Turborepo** ile yönetilen full-stack TypeScript monorepo şablonu. İki backend seçeneği (Hono ve NestJS), bir Next.js web uygulaması ve bir Expo React Native uygulaması içerir — hepsi veritabanı erişimi, ortam değişkeni doğrulama, API istemcisi ve iş mantığı için ortak tipli paketleri paylaşır.
+**pnpm workspaces** ve **Turborepo** ile yönetilen full-stack TypeScript monorepo şablonu. Bir API sunucusu, bir web uygulaması, bir mobil uygulama — sıfır codegen ile tip güvenli API çağrıları paylaşır.
 
-**Teknoloji:** TypeScript · pnpm · Turborepo · Hono · NestJS · Next.js · Expo · Drizzle ORM · SQLite · Zod · Tailwind CSS · shadcn/ui · Docker
+**Teknoloji:** TypeScript · pnpm · Turborepo · Hono · Next.js · Expo · Drizzle ORM · SQLite · Zod · Tailwind CSS · shadcn/ui · Docker
 
 > 🇬🇧 [English README](./README.md)
 
 ## Hızlı Başlangıç
 
 ```bash
-git clone <repo-url> ts-monorepo-starter
-cd ts-monorepo-starter
+git clone <your-repo-url> my-app
+cd my-app
 pnpm install
-
-# Tüm uygulamaları geliştirme modunda başlat
 pnpm dev
 ```
-
-Bu kadar. Dört uygulama da varsayılan ayarlarla başlar — geliştirme için `.env` dosyası gerekmez:
 
 | Uygulama      | URL                     |
 |---------------|-------------------------|
 | Next.js       | http://localhost:3000    |
 | Hono API      | http://localhost:3001    |
-| NestJS API    | http://localhost:3002    |
 | Expo (web)    | http://localhost:8081    |
 
-> **Not:** Backend uygulamalar (Hono, NestJS) `.env.example` dosyaları içerir. Varsayılan değerler env doğrulama katmanına dahildir, bu yüzden `pnpm dev` kutudan çıktığı gibi çalışır. `.env.example` dosyasını `.env` olarak kopyalayın yalnızca varsayılanları değiştirmek istediğinizde.
+`.env` dosyası gerekmez — varsayılan değerler yerleşiktir.
 
 ## Proje Yapısı
 
 ```
 ├── apps/
-│   ├── honojs/           # Hafif REST API (Hono + Node.js adaptörü)
-│   ├── nestjs/           # Kurumsal REST API (NestJS + SWC)
+│   ├── honojs/           # REST API (Hono + SQLite + Drizzle ORM)
 │   ├── nextjs/           # Web uygulaması (Next.js + Tailwind + shadcn/ui)
-│   └── react-native/     # Mobil + web uygulaması (Expo SDK)
+│   └── react-native/     # Mobil + web uygulaması (Expo)
 ├── packages/
-│   ├── api-client/       # Tip güvenli Hono RPC istemcisi
-│   ├── db/               # Drizzle ORM client factory (sadece driver, schema yok)
-│   ├── env/              # Zod tabanlı env doğrulama (createEnv + z)
-│   ├── eslint-config/    # Paylaşılan ESLint flat config'ler
-│   ├── shared/           # Paylaşılan tipler, şemalar ve yardımcılar
+│   ├── eslint-config/    # Paylaşılan ESLint flat config'leri
 │   └── typescript-config/ # Paylaşılan tsconfig tabanları
-├── docker-compose.yml      # Geliştirme container'ları (hot-reload)
-├── docker-compose.prod.yml # Production container'ları (multi-stage build)
-├── pnpm-workspace.yaml     # Workspace + versiyon kataloğu
-├── turbo.json              # Turborepo pipeline yapılandırması
-└── package.json            # Kök betikler
+├── docker-compose.yml
+├── docker-compose.prod.yml
+├── pnpm-workspace.yaml
+└── turbo.json
 ```
+
+**3 uygulama, 2 config paketi.** Her uygulama kendi bağımlılıkları, tipleri ve veritabanı kurulumu ile bağımsızdır. Config paketleri lint ve TypeScript ayarlarını workspace genelinde paylaşır.
 
 ## Uygulamalar
 
 | Uygulama | Framework | Port | Açıklama |
 |----------|-----------|------|----------|
-| `apps/honojs` | [Hono](https://hono.dev/) | 3001 | Tipli RPC export'ları ile hafif REST API. `@hono/node-server` adaptörü, veri erişimi için Drizzle ORM ve istek doğrulama için Zod kullanır. |
-| `apps/nestjs` | [NestJS](https://nestjs.com/) | 3002 | Dekoratör tabanlı DI ile kurumsal düzeyde REST API. Geliştirme modunda SWC (`--watch`), production build'lerinde tsc kullanır. |
-| `apps/nextjs` | [Next.js](https://nextjs.org/) | 3000 | Tailwind CSS v4 ve shadcn/ui bileşenleri ile web uygulaması. Tipli `@repo/api-client` aracılığıyla Hono API'den veri çeker. |
-| `apps/react-native` | [Expo](https://expo.dev/) | 8081 | Web çıktısı ile çapraz platform mobil uygulama. Geliştirme için Expo SDK ve `expo start --web` kullanır. |
+| `apps/honojs` | [Hono](https://hono.dev/) | 3001 | Tipli RPC export'ları ile REST API. Drizzle ORM ile SQLite, Zod doğrulama, Drizzle migration'ları. |
+| `apps/nextjs` | [Next.js](https://nextjs.org/) | 3000 | Tailwind CSS v4 ve shadcn/ui ile web uygulaması. Hono API'den uçtan uca tip güvenliğiyle veri çeker. |
+| `apps/react-native` | [Expo](https://expo.dev/) | 8081 | Çapraz platform mobil uygulama. Next.js ile aynı tipli API istemcisi. |
 
-## Paketler
+## Tip Güvenli API Zinciri
 
-| Paket | Amaç |
-|-------|------|
-| `@repo/api-client` | Tip güvenli Hono RPC istemcisi — codegen olmadan uçtan uca tip güvenliği için `apps/honojs`'den `AppType` import eder. |
-| `@repo/db` | Drizzle ORM client factory — `createSqliteDb()` ve `createPgDb()` sağlar. Her uygulama kendi schema ve migration'larına sahiptir. |
-| `@repo/env` | `@t3-oss/env-core`'dan `createEnv` ve Zod'dan `z`'yi yeniden export eder. Her uygulama bu temel öğeleri kullanarak kendi env şemasını tanımlar. |
-| `@repo/shared` | Paylaşılan TypeScript tipleri, Zod şemaları, sabitler ve yardımcı fonksiyonlar. |
-| `@repo/eslint-config` | ESLint flat config ön ayarları: `base`, `library`, `react`, `next`. |
-| `@repo/typescript-config` | Paylaşılan `tsconfig.json` tabanları: `base`, `library`, `react`, `next`. |
+Frontend uygulamalar Hono API'den `AppType` import eder ve `hono/client` ile tam tipli API çağrıları yapar — codegen yok, OpenAPI yok, sadece TypeScript çıkarımı:
+
+```
+apps/honojs (route tanımlar → AppType export eder)
+    ↓ tip import
+apps/nextjs, apps/react-native (hc<AppType> → tipli API istemcisi)
+```
 
 ## Ortam Değişkenleri
 
-Bu şablon **Zod tabanlı, erken-hata** env doğrulama deseni kullanır:
-
-1. `@repo/env`, `createEnv` ve `z`'yi tek bir import olarak sağlar
-2. Her uygulama kendi env şemasını tanımlar (ör. `apps/honojs/src/env.ts`)
-3. Geçersiz veya eksik env değişkenleri, açık bir hata mesajıyla anında başlatma hatası verir
-
-Backend uygulamalar (Hono, NestJS) tüm env değişkenleri için **varsayılan değerlere** sahiptir — `.env` dosyası olmadan çalışırlar. Her uygulamanın `.env.example` dosyasında mevcut değişkenler:
+Her uygulama kendi env şemasını [t3-env](https://env.t3.gg/) + Zod ile tanımlar. Geçersiz değişkenler anında başlatma hatası verir.
 
 | Uygulama | Env Dosyası | Değişkenler |
 |----------|-------------|-------------|
-| `apps/honojs` | `.env.example` | `PORT` (3001), `NODE_ENV` (development), `DATABASE_URL` (./data/dev.db) |
-| `apps/nestjs` | `.env.example` | `PORT` (3002), `NODE_ENV` (development), `DATABASE_URL` (postgresql://...) |
-| `apps/nextjs` | `.env.example` | `NEXT_PUBLIC_API_URL` (http://localhost:3001) |
-| `apps/react-native` | `.env.example` | `EXPO_PUBLIC_API_URL` (http://localhost:3001) |
+| `apps/honojs` | `.env.example` | `PORT` (3001), `NODE_ENV`, `DATABASE_URL` (./data/dev.db) |
+| `apps/nextjs` | `.env` | `NEXT_PUBLIC_API_URL` (http://localhost:3001) |
+| `apps/react-native` | `.env` | `EXPO_PUBLIC_API_URL` (http://localhost:3001) |
 
-Next.js, `NEXT_PUBLIC_` prefix zorunluluğu ile `@t3-oss/env-nextjs` kullanır. Expo, `EXPO_PUBLIC_` prefix ile `@t3-oss/env-core` kullanır.
+## Veritabanı
 
-## Betikler
+Hono API **SQLite**'ı Drizzle ORM ile kullanır. Schema, config ve migration'lar `apps/honojs/` içinde yaşar:
 
-### Kök Seviye (Turborepo ile)
+```
+apps/honojs/
+├── src/db/schema.ts      # Drizzle şeması (tablolar)
+├── drizzle.config.ts     # Drizzle Kit config
+└── drizzle/              # Oluşturulan migration dosyaları
+```
+
+Migration'lar uygulama başlatılırken otomatik çalışır. Schema değişikliğinden sonra yeni migration oluşturmak için:
+
+```bash
+cd apps/honojs
+pnpm db:generate    # Schema diff'inden migration oluştur
+pnpm db:studio      # Drizzle Studio'yu aç (tarayıcı arayüzü)
+```
+
+## Scriptler
+
+### Root (Turborepo ile)
 
 | Komut | Açıklama |
 |-------|----------|
-| `pnpm dev` | Tüm uygulamaları geliştirme modunda başlat (watch/HMR) |
+| `pnpm dev` | Tüm uygulamaları dev modunda başlat |
 | `pnpm build` | Tüm uygulama ve paketleri derle |
 | `pnpm lint` | Tüm workspace'leri lint'le |
-| `pnpm check-types` | Tüm workspace'lerin tip kontrolünü yap |
-| `pnpm format` | Prettier ile tüm dosyaları formatla |
-| `pnpm format:check` | Yazmadan formatlamayı kontrol et |
-
-### Docker
-
-| Komut | Açıklama |
-|-------|----------|
-| `pnpm docker:dev` | Geliştirme container'larını başlat (volume mount ile hot-reload) |
-| `pnpm docker:prod` | Production container'larını derle ve başlat |
-| `pnpm docker:prod:detach` | Yukarıdakinin aynısı, arka plan modunda |
-| `pnpm docker:down` | Geliştirme container'larını durdur |
-| `pnpm docker:prod:down` | Production container'larını durdur |
+| `pnpm check-types` | Tüm workspace'lerde tip kontrolü |
+| `pnpm format` | Prettier ile formatla |
 
 ### Filtreleme
 
-Turborepo'nun `--filter` özelliğiyle belirli bir workspace için komut çalıştırın:
-
 ```bash
-pnpm dev --filter honojs          # Sadece Hono API'yi başlat
-pnpm build --filter @repo/shared  # Sadece shared paketini derle
-pnpm lint --filter nextjs         # Sadece Next.js uygulamasını lint'le
+pnpm dev --filter honojs     # Sadece API'yi başlat
+pnpm build --filter nextjs   # Sadece web uygulamasını derle
 ```
 
 ## Docker
 
-Üç uygulama container'a alınmıştır: **Hono**, **NestJS** ve **Next.js**. React Native (Expo) dahil değildir — mobil cihazları ve web'i Expo'nun kendi araçlarıyla hedefler.
+İki uygulama containerize edilmiştir: **Hono API** ve **Next.js**. Expo mobil cihazları kendi araçlarıyla hedefler.
 
 ### Geliştirme
 
@@ -132,13 +117,7 @@ pnpm lint --filter nextjs         # Sadece Next.js uygulamasını lint'le
 pnpm docker:dev
 ```
 
-`docker-compose.yml` kullanır. Kaynak dizinler volume olarak bağlanır, böylece kod değişiklikleri container içinde hot-reload'u tetikler. Geliştirme sırasında yeniden derleme gerekmez.
-
-| Servis  | Container Portu | Host Portu |
-|---------|----------------|------------|
-| honojs  | 3001           | 3001       |
-| nestjs  | 3002           | 3002       |
-| nextjs  | 3000           | 3000       |
+Kaynak dizinler hot-reload için volume olarak bağlanır. Yeniden derleme gerekmez.
 
 ### Production
 
@@ -146,97 +125,26 @@ pnpm docker:dev
 pnpm docker:prod
 ```
 
-`docker-compose.prod.yml` kullanır. Her uygulama minimal image'lar üreten **multi-stage Dockerfile'lar** ile derlenir:
-
-| Image | Boyut | Taban |
-|-------|-------|-------|
-| `repo-nextjs` | ~74 MB | `node:22-alpine` (standalone çıktı) |
-| `repo-honojs` | ~101 MB | `node:22-alpine` |
-| `repo-nestjs` | ~108 MB | `node:22-alpine` |
-
-Production özellikleri:
-- **Multi-stage build** — ayrı install, build ve runtime aşamaları; geliştirme bağımlılıkları son image'dan çıkarılır
-- **Standalone Next.js** — `next.config.ts`'de `output: 'standalone'` yalnızca gerekli olanı paketler
-- **Sağlık kontrolleri** — tüm servislerde Docker `HEALTHCHECK` ile `/api/health` endpoint'leri
-- **Yeniden başlatma politikası** — otomatik kurtarma için `unless-stopped`
-- **Bağımlılık sıralaması** — Next.js, başlamadan önce Hono API'nin sağlıklı olmasını bekler
-- **Kalıcı veri** — PostgreSQL verisi adlandırılmış Docker volume'larında saklanır
-
-### Build Argümanları
-
-Next.js, build zamanında `NEXT_PUBLIC_API_URL` gerektirir (istemci bundle'ına gömülür):
+Çok aşamalı Dockerfile'lar minimal Alpine image'ları üretir. Özellikler:
+- Tüm servislerde sağlık kontrolleri
+- `unless-stopped` yeniden başlatma politikası
+- Next.js, Hono API sağlıklı olana kadar bekler
+- SQLite verisi adlandırılmış Docker volume ile kalıcı
 
 ```bash
-docker compose -f docker-compose.prod.yml build --build-arg NEXT_PUBLIC_API_URL=https://api.example.com
-```
-
-Veya ortam değişkeni ile ayarlayın (compose dosyasında `http://localhost:3001` varsayılanı vardır):
-
-```bash
+# Next.js client bundle için API URL'ini geçersiz kıl
 NEXT_PUBLIC_API_URL=https://api.example.com pnpm docker:prod
-```
-
-### Tek Tek Image Derleme
-
-```bash
-# Repo kökünden (context monorepo kökü olmalıdır)
-docker build -f apps/honojs/Dockerfile -t repo-honojs .
-docker build -f apps/nestjs/Dockerfile -t repo-nestjs .
-docker build -f apps/nextjs/Dockerfile -t repo-nextjs --build-arg NEXT_PUBLIC_API_URL=http://localhost:3001 .
 ```
 
 ## Mimari Notlar
 
-### pnpm Kataloğu
+### pnpm Catalog
 
-Tüm paylaşılan bağımlılık versiyonları `pnpm-workspace.yaml`'daki tek bir `catalog:` bloğunda sabitlenir. Workspace paketleri, sabit semver yerine `"catalog:"` ile versiyonlara referans verir — TypeScript, ESLint, Zod vb. güncellemek için tek bir yer.
+Paylaşılan bağımlılık versiyonları `pnpm-workspace.yaml`'daki `catalog:` bloğunda sabitlenir. TypeScript, ESLint, Zod vb. güncellemek için tek bir yer.
 
-### Hono RPC Tip Zinciri
+### Neden Tipler/DB/Env için Paylaşılan Paket Yok?
 
-`@repo/api-client`, `apps/honojs`'den `AppType` import eder ve tipli bir Hono RPC istemcisi oluşturur. Bu, frontend uygulamalara API çağrıları için uçtan uca tip güvenliği sağlar — codegen yok, OpenAPI yok, sadece sunucu route'larından TypeScript çıkarımı.
-
-```
-apps/honojs (route'lar + AppType tanımlar)
-    ↓ tip export
-packages/api-client (tipli hono/client oluşturur)
-    ↓ kullanılır
-apps/nextjs, apps/react-native
-```
-
-### NestJS Derleme Stratejisi
-
-- **Geliştirme:** `node --watch --import @swc-node/register/esm-register` — SWC, dekoratör metadata desteğiyle TypeScript'i anında derler
-- **Derleme:** `tsc` — esbuild/tsup dekoratör metadata'yı çıkarır, bu yüzden production build'lerinde tsc kullanılır
-
-### Docker Derleme Stratejisi
-
-Tüm Dockerfile'lar aynı 4 aşamalı kalıbı izler:
-
-1. **base** — corepack ile pnpm etkinleştirilmiş Alpine Node.js
-2. **deps** — Yalnızca `package.json` dosyaları + lockfile kopyalanır, ardından `pnpm install --frozen-lockfile` (katman önbelleğini maksimize eder)
-3. **build** — Kaynak kod kopyalanır, paketler bağımlılık sırasına göre derlenir
-4. **production** — Yalnızca production bağımlılıkları + derlenmiş çıktı ile temiz image
-
-Build context'i her zaman **monorepo kökü**dür (`docker build -f apps/xxx/Dockerfile .`) çünkü workspace paketlerinin ağaç boyunca çözümlenmesi gerekir.
-
-### Veritabanı
-
-Her uygulama kendi **schema, migration ve veritabanı driver'ına** sahiptir — paylaşılan schema bağımlılığı yoktur.
-
-| Uygulama | Driver | Schema | Config |
-|----------|--------|--------|--------|
-| `apps/honojs` | SQLite (`@repo/db/sqlite`) | `src/db/schema.ts` | `drizzle.config.ts` |
-| `apps/nestjs` | PostgreSQL (`@repo/db/pg`) | `src/db/schema.ts` | `drizzle.config.ts` |
-
-`packages/db` ince bir yardımcı katmandır — sadece client factory ve tip export'ları. Schema barındırmaz.
-
-**Drizzle migration'ları** uygulama bazındadır:
-```bash
-cd apps/honojs && pnpm db:generate  # SQLite migration oluştur
-cd apps/nestjs && pnpm db:generate  # PG migration oluştur
-```
-
-Migration'lar uygulama başlatılırken otomatik çalışır. Docker'da PostgreSQL verisi `postgres-data` volume ile kalıcı hale getirilir.
+Bilinçli bir tercih. Küçük wrapper'lar (`createEnv`, `hc<AppType>`) kendi build config'leri ve tsconfig'leri olan ayrı paketlerin yükünü hak etmez. Her uygulama ihtiyacını doğrudan import eder. Paylaşılan tek paketler config'lerdir (ESLint, TypeScript) — bunlar gerçekten tekrarı azaltır.
 
 ## Lisans
 
